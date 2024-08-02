@@ -6,7 +6,7 @@
     "extraFileExtensions": [".astro"]
   },
   "rules": {
-    "prettier/prettier": ["error", { "tabWidth": 4 }]
+    "prettier/prettier": ["error"]
   },
   "overrides": [
     // Configuration for .mjs and .cjs files  (ESM and CJS)

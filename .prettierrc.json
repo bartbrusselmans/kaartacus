@@ -8,7 +8,7 @@
   "semi": true,
   "trailingComma": "all",
   "printWidth": 80,
-  "tabWidth": 4,
+  "tabWidth": 2,
   "arrowParens": "avoid",
   "tailwindConfig": "./tailwind.config.mjs",
   "tailwindFunctions": ["tv"],
@@ -20,12 +20,6 @@
       "files": "*.astro",
       "options": {
         "parser": "astro"
-      }
-    },
-    {
-      "files": "*.json",
-      "options": {
-        "tabWidth": 2
       }
     }
   ]
