@@ -8,19 +8,25 @@
   "semi": true,
   "trailingComma": "all",
   "printWidth": 80,
-  "tabWidth": 2,
+  "tabWidth": 4,
   "arrowParens": "avoid",
+  "tailwindConfig": "./tailwind.config.mjs",
+  "tailwindFunctions": ["tv"],
+  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
   "overrides": [
     {
       "files": "*.astro",
       "options": {
         "parser": "astro"
       }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "tabWidth": 2
+      }
     }
-  ],
-  "tailwindConfig": "./tailwind.config.mjs",
-  "tailwindFunctions": ["tv"],
-  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  ]
 }
