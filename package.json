@@ -6,14 +6,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview",
+    "dev": "nx exec -- astro dev",
+    "build": "nx exec -- astro check && astro build",
+    "preview": "nx exec -- astro preview",
     "astro": "astro",
     "prepare": "husky",
-    "lint": "eslint . --fix",
-    "format": "prettier --write ."
+    "lint": "nx exec -- eslint . --fix",
+    "format": "nx exec -- prettier --write ."
   },
   "dependencies": {
     "@astrojs/check": "^0.9.1",
@@ -50,11 +49,14 @@
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.6.5"
+    "prettier-plugin-tailwindcss": "^0.6.5",
+    "nx": "19.5.6",
+    "@nx/eslint": "19.5.6"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  }
+  },
+  "nx": {}
 }
