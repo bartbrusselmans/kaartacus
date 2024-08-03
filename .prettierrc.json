@@ -12,7 +12,7 @@
   "arrowParens": "avoid",
   "tailwindConfig": "./tailwind.config.mjs",
   "tailwindFunctions": ["tv"],
-  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrder": ["^@workers/(.*)$", "^[./]"],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
   "overrides": [
