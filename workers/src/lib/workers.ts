@@ -1,37 +1,95 @@
 import { xml2json } from 'xml-js';
 
+interface BggUser {
+  username: string;
+  name: string;
+}
 interface WorkerData {
-  bggEndpoints: string[];
-  contentfulEndpoint: string;
+  users: BggUser[];
 }
 
+interface BggBoardgame {
+  image: {
+    _text: string;
+  };
+  thumbnail: {
+    _text: string;
+  };
+  name: {
+    _text: string;
+    _atributes: {
+      sortindex: string;
+    };
+  };
+  yearpublished: {
+    _text: string;
+  };
+  _attributes: {
+    objectid: string;
+    objecttype: string;
+    subtype: string;
+    collid: string;
+  };
+  numplays: {
+    _text: string;
+  };
+  status: {
+    fortrade: '1' | '0';
+    own: '1' | '0';
+    prevowned: '1' | '0';
+    want: '1' | '0';
+    wanttoplay: '1' | '0';
+    wanttobuy: '1' | '0';
+    wishlist: '1' | '0';
+    lastmodified: Date;
+  };
+}
+
+interface BggResponse {
+  user: string;
+  games: BggBoardgame[];
+}
+
+const BGG_HOST = import.meta.env['PUBLIC_BGG_HOST'];
+
 self.onmessage = async (event: MessageEvent<WorkerData>) => {
-  const { bggEndpoints, contentfulEndpoint } = event.data;
+  const { users } = event.data;
 
   try {
     // Fetch data from APIs
-    const responses = await fetch(bggEndpoints[0])
-      .then(response => response.text())
-      .then(data => xml2json(data, { compact: true, spaces: 4 }))
-      .then(json => JSON.parse(json))
-      .then(json => json.items.item);
-    // const responses = await Promise.all(
-    //   bggEndpoints.map(url =>
-    //     fetch(url)
-    //       .then(response => response.text())
-    //       .then(data => xml2json(data, { compact: true, spaces: 4 }))
-    //       .then(json => JSON.parse(json))
-    //       .then(json => json.items.item),
-    //   ),
-    // );
+    const responses = await Promise.all(
+      users.map(user =>
+        fetch(`${BGG_HOST}/collection?username=${user.username}`)
+          .then(response => {
+            return response.text();
+          })
+          .then(data => xml2json(data, { compact: true, spaces: 4 }))
+          .then(json => JSON.parse(json))
+          .then(
+            json =>
+              ({ user: user.name, games: json.items.item }) as BggResponse,
+          ),
+      ),
+    );
+    console.log(
+      '🚀 ~ file: workers.ts:35 ~ self.onmessage= ~ responses:',
+      responses,
+    );
 
     // Transform data
     const transformedData = responses.map(response => {
-      // console.log(
-      //   '🚀 ~ file: workers.ts:39 ~ transformedData ~ response:',
-      //   typeof response,
-      // );
-      return transformData(response);
+      // const updatedData = response.games.map((boardgame: any) => {
+      //   return transformData(boardgame);
+      // });
+
+      const updatedData = {
+        ...response,
+        games: response.games.map(boardgame => {
+          return transformData(boardgame);
+        }),
+      };
+
+      return updatedData;
     });
 
     // Send data to CMS
@@ -59,8 +117,7 @@ self.onmessage = async (event: MessageEvent<WorkerData>) => {
   }
 };
 
-const transformData = (boardgame: any): any => {
-  console.log('🚀 ~ file: workers.ts:60 ~ transformData ~ data:', boardgame);
+const transformData = (boardgame: BggBoardgame) => {
   // Implement your boardgame transformation logic here
   return {
     name: boardgame.name._text,

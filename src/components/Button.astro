@@ -1,0 +1,81 @@
+---
+
+---
+
+<button
+  class="button flex justify-center bg-red-500 text-white py-2 px-4 rounded-lg cursor-pointer transition duration-300 ease-in-out hover:bg-red-600"
+>
+  <slot />
+</button>
+<div id="data-container"></div>
+
+<script>
+  import { workerScript } from '@workerScript';
+
+  const initializeWorker = (users: string[]) => {
+    const worker = new Worker(workerScript, { type: 'module' });
+
+    // Send data to worker
+    worker.postMessage({ users });
+
+    // Handle messages from worker
+    worker.onmessage = (event: MessageEvent<string>) => {
+      const dataContainer = document.getElementById('data-container');
+
+      if (dataContainer) {
+        try {
+          const users = JSON.parse(event.data);
+
+          if (Array.isArray(users)) {
+            dataContainer.innerHTML = `
+            <ul>
+              ${users
+                .map(
+                  user => `
+                  <li class="font-semibold text-white">
+                    ${user.user}
+                    <ul class="font-normal">
+                      ${user.games
+                        .map(
+                          (game, index) => `
+                          <li class="pl-4">
+                            ${index}: ${game.name} (${game.yearPublished})
+                          </li>
+                        `,
+                        )
+                        .join('')}
+                    </ul>
+                </li>
+                `,
+                )
+                .join('')}
+            </ul>
+          `;
+          } else {
+            console.error('Parsed data is not an array');
+            dataContainer.innerHTML =
+              '<p>Error: Data is not in the expected format.</p>';
+          }
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+          dataContainer.innerHTML = '<p>Error: Invalid data format.</p>';
+        }
+      }
+    };
+
+    // Handle errors
+    worker.onerror = (error: ErrorEvent) => {
+      console.error('Error in worker: ', error.message);
+    };
+  };
+
+  const buttons = document.querySelectorAll('button.button');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const bggUsernames = JSON.parse(import.meta.env.PUBLIC_BGG_USERS);
+
+      const worker = initializeWorker(bggUsernames);
+    });
+  });
+</script>
